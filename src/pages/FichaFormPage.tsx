@@ -1110,10 +1110,11 @@ export function FichaFormPage() {
                 </label>
                 <input
                   type="number"
-                  min={0}
+                  min={1}
                   aria-invalid={Boolean(errors.nroAmbientesDormir)}
                   {...register('nroAmbientesDormir', {
                     required: 'Ingresa el número de ambientes para dormir',
+                    min: { value: 1, message: 'Debe ser al menos 1' },
                   })}
                 />
                 {mensajeError('nroAmbientesDormir')}
