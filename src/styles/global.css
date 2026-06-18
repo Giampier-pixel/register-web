@@ -523,6 +523,14 @@ a {
   border-top: none;
 }
 
+.seccion--puntaje {
+  background: var(--papel-hundido);
+  border-top: none;
+  border-radius: var(--radio);
+  padding: 18px 20px 22px;
+  margin-bottom: 8px;
+}
+
 .seccion > legend,
 .seccion > .seccion__titulo {
   font-family: var(--f-display);
@@ -792,6 +800,35 @@ table.tabla {
 
 .insignia--ts::before {
   background: var(--tinta-suave);
+}
+
+.insignia--categoria-a {
+  background: var(--verde-tenue);
+  color: var(--verde-oscuro);
+}
+
+.insignia--categoria-a::before {
+  background: var(--verde);
+}
+
+.insignia--categoria-b {
+  background: var(--ambar-tenue);
+  color: var(--ambar);
+}
+
+.insignia--categoria-b::before {
+  background: var(--ambar);
+}
+
+.insignia--categoria-c,
+.insignia--categoria-z {
+  background: var(--arcilla-tenue);
+  color: var(--arcilla);
+}
+
+.insignia--categoria-c::before,
+.insignia--categoria-z::before {
+  background: var(--arcilla);
 }
 
 /* ---------- paginación ---------- */
