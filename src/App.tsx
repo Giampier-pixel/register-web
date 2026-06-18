@@ -10,10 +10,10 @@ import { AuthProvider, useAuth } from './auth/AuthContext';
 import { Cargando } from './components/Cargando';
 import { Layout } from './Layout';
 import { CambiarPasswordPage } from './pages/CambiarPasswordPage';
+import { FichaDetallePage } from './pages/FichaDetallePage';
+import { FichaFormPage } from './pages/FichaFormPage';
+import { FichasPage } from './pages/FichasPage';
 import { LoginPage } from './pages/LoginPage';
-import { TarjetaDetallePage } from './pages/TarjetaDetallePage';
-import { TarjetaFormPage } from './pages/TarjetaFormPage';
-import { TarjetasPage } from './pages/TarjetasPage';
 import { UsuariosPage } from './pages/UsuariosPage';
 
 const queryClient = new QueryClient({
@@ -36,7 +36,7 @@ function RequiereSesion() {
 function SoloAdmin() {
   const { usuario } = useAuth();
   if (usuario?.rol !== 'ADMIN') {
-    return <Navigate to="/tarjetas" replace />;
+    return <Navigate to="/fichas" replace />;
   }
   return <Outlet />;
 }
@@ -50,13 +50,13 @@ export function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route element={<RequiereSesion />}>
               <Route element={<Layout />}>
-                <Route path="/" element={<Navigate to="/tarjetas" replace />} />
-                <Route path="/tarjetas" element={<TarjetasPage />} />
-                <Route path="/tarjetas/nueva" element={<TarjetaFormPage />} />
-                <Route path="/tarjetas/:id" element={<TarjetaDetallePage />} />
+                <Route path="/" element={<Navigate to="/fichas" replace />} />
+                <Route path="/fichas" element={<FichasPage />} />
+                <Route path="/fichas/nueva" element={<FichaFormPage />} />
+                <Route path="/fichas/:id" element={<FichaDetallePage />} />
                 <Route
-                  path="/tarjetas/:id/editar"
-                  element={<TarjetaFormPage />}
+                  path="/fichas/:id/editar"
+                  element={<FichaFormPage />}
                 />
                 <Route
                   path="/cambiar-password"
@@ -67,7 +67,7 @@ export function App() {
                 </Route>
               </Route>
             </Route>
-            <Route path="*" element={<Navigate to="/tarjetas" replace />} />
+            <Route path="*" element={<Navigate to="/fichas" replace />} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>

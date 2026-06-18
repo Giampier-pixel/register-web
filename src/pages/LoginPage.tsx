@@ -12,7 +12,7 @@ export function LoginPage() {
   const [enviando, setEnviando] = useState(false);
 
   if (usuario) {
-    return <Navigate to="/tarjetas" replace />;
+    return <Navigate to="/fichas" replace />;
   }
 
   const alEnviar = async (e: FormEvent) => {
@@ -38,7 +38,7 @@ export function LoginPage() {
             +
           </div>
           <div className="hospital">Hospital «Daniel A. Carrión»</div>
-          <h1>Tarjetas de Trabajo Social</h1>
+          <h1>Fichas de Trabajo Social</h1>
         </div>
 
         <form className="login-tarjeta" onSubmit={alEnviar}>
