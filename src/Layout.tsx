@@ -10,7 +10,7 @@ export function Layout() {
     <>
       <header className="app-header">
         <div className="app-header__inner">
-          <NavLink to="/tarjetas" className="app-header__marca">
+          <NavLink to="/fichas" className="app-header__marca">
             <span className="app-header__hospital">
               Hospital «Daniel A. Carrión»
             </span>
@@ -19,17 +19,17 @@ export function Layout() {
 
           <nav className="app-header__nav" aria-label="Principal">
             <NavLink
-              to="/tarjetas"
+              to="/fichas"
               className={({ isActive }) => (isActive ? 'activo' : '')}
               end
             >
-              Tarjetas
+              Fichas
             </NavLink>
             <NavLink
-              to="/tarjetas/nueva"
+              to="/fichas/nueva"
               className={({ isActive }) => (isActive ? 'activo' : '')}
             >
-              Nueva tarjeta
+              Nueva ficha
             </NavLink>
             {usuario?.rol === 'ADMIN' && (
               <NavLink

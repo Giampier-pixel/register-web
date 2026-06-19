@@ -90,7 +90,7 @@ export const http = {
   delete: <T>(ruta: string) => pedir<T>('DELETE', ruta),
 };
 
-/** Descarga binaria autenticada (el PDF de la tarjeta). */
+/** Descarga binaria autenticada. */
 export async function descargarArchivo(
   ruta: string,
   nombreArchivo: string,

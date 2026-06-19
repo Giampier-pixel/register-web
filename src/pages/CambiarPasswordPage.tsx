@@ -24,7 +24,7 @@ export function CambiarPasswordPage() {
     try {
       await authApi.cambiarPassword(actual, nueva);
       setExito(true);
-      setTimeout(() => navigate('/tarjetas'), 1600);
+      setTimeout(() => navigate('/fichas'), 1600);
     } catch (err) {
       setError(
         err instanceof ApiError

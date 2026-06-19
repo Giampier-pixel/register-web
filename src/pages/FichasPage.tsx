@@ -1,9 +1,9 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { tarjetasApi } from '../api';
+import { fichasApi } from '../api';
 import { ApiError } from '../api/client';
-import type { Tarjeta } from '../api/types';
+import { CATEGORIAS, type Categoria } from '../api/types';
 import { Cargando } from '../components/Cargando';
 import { Icono } from '../components/Icono';
 
@@ -18,15 +18,15 @@ function formatearFecha(iso: string): string {
   }).format(new Date(iso));
 }
 
-export function TarjetasPage() {
+export function FichasPage() {
   const navigate = useNavigate();
   const [busqueda, setBusqueda] = useState('');
   const [busquedaAplicada, setBusquedaAplicada] = useState('');
   const [fechaDesde, setFechaDesde] = useState('');
   const [fechaHasta, setFechaHasta] = useState('');
   const [estado, setEstado] = useState<'' | 'true' | 'false'>('true');
+  const [categoria, setCategoria] = useState<Categoria | ''>('');
   const [pagina, setPagina] = useState(1);
-  const [descargando, setDescargando] = useState<string | null>(null);
 
   // Búsqueda con retardo para no golpear la API en cada tecla.
   useEffect(() => {
@@ -39,12 +39,13 @@ export function TarjetasPage() {
 
   const { data, isPending, isError, error } = useQuery({
     queryKey: [
-      'tarjetas',
-      { busquedaAplicada, fechaDesde, fechaHasta, estado, pagina },
+      'fichas',
+      { busquedaAplicada, fechaDesde, fechaHasta, estado, categoria, pagina },
     ],
     queryFn: () =>
-      tarjetasApi.listar({
+      fichasApi.listar({
         search: busquedaAplicada,
+        categoria,
         fechaDesde,
         fechaHasta,
         activa: estado,
@@ -54,29 +55,20 @@ export function TarjetasPage() {
     placeholderData: keepPreviousData,
   });
 
-  const alDescargarPdf = async (tarjeta: Tarjeta) => {
-    setDescargando(tarjeta.id);
-    try {
-      await tarjetasApi.descargarPdf(tarjeta.id, tarjeta.nroTarjetaSocial);
-    } finally {
-      setDescargando(null);
-    }
-  };
-
   const meta = data?.meta;
 
   return (
     <>
       <div className="pagina-cabecera">
         <div>
-          <h1>Tarjetas registradas</h1>
+          <h1>Fichas registradas</h1>
           <p className="subtitulo mt-0">
-            Busca por paciente, Nº de tarjeta o Nº de historia clínica
+            Busca por paciente, Nº de ficha o Nº de historia clínica
           </p>
         </div>
-        <Link to="/tarjetas/nueva" className="btn btn--primario">
+        <Link to="/fichas/nueva" className="btn btn--primario">
           <Icono nombre="mas" />
-          Nueva tarjeta
+          Nueva ficha
         </Link>
       </div>
 
@@ -91,6 +83,24 @@ export function TarjetasPage() {
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
             />
+          </div>
+          <div className="campo">
+            <label htmlFor="categoria">Categoría</label>
+            <select
+              id="categoria"
+              value={categoria}
+              onChange={(e) => {
+                setCategoria(e.target.value as Categoria | '');
+                setPagina(1);
+              }}
+            >
+              <option value="">Todas</option>
+              {CATEGORIAS.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
           </div>
           <div className="campo">
             <label htmlFor="desde">Desde</label>
@@ -134,7 +144,7 @@ export function TarjetasPage() {
         </div>
 
         {isPending ? (
-          <Cargando texto="Buscando tarjetas…" />
+          <Cargando texto="Buscando fichas…" />
         ) : isError ? (
           <div className="tabla-vacia" role="alert">
             <span className="glifo">!</span>
@@ -145,7 +155,7 @@ export function TarjetasPage() {
         ) : data.data.length === 0 ? (
           <div className="tabla-vacia">
             <span className="glifo">§</span>
-            No se encontraron tarjetas con esos criterios.
+            No se encontraron fichas con esos criterios.
           </div>
         ) : (
           <>
@@ -153,71 +163,56 @@ export function TarjetasPage() {
               <table className="tabla">
                 <thead>
                   <tr>
-                    <th>Nº Tarjeta</th>
+                    <th>Nº Ficha</th>
                     <th>Paciente</th>
-                    <th>Procedencia</th>
-                    <th>Inscripción</th>
+                    <th>Categoría</th>
+                    <th>Puntaje</th>
+                    <th>Fecha</th>
                     <th>Estado</th>
-                    <th aria-label="Acciones" />
                   </tr>
                 </thead>
                 <tbody>
-                  {data.data.map((tarjeta) => (
+                  {data.data.map((ficha) => (
                     <tr
-                      key={tarjeta.id}
-                      onClick={() => navigate(`/tarjetas/${tarjeta.id}`)}
+                      key={ficha.id}
+                      onClick={() => navigate(`/fichas/${ficha.id}`)}
                     >
-                      <td className="folio-celda">
-                        {tarjeta.nroTarjetaSocial}
-                      </td>
+                      <td className="folio-celda">{ficha.nroFichaSocial}</td>
                       <td className="paciente-celda">
                         <strong>
-                          {tarjeta.paciente.apellidoPaterno}{' '}
-                          {tarjeta.paciente.apellidoMaterno},{' '}
-                          {tarjeta.paciente.nombres}
+                          {ficha.paciente.apellidoPaterno}{' '}
+                          {ficha.paciente.apellidoMaterno},{' '}
+                          {ficha.paciente.nombres}
                         </strong>
                         <span>
-                          {tarjeta.paciente.nroHistoriaClinica
-                            ? `H.C. ${tarjeta.paciente.nroHistoriaClinica}`
+                          {ficha.paciente.nroHistoriaClinica
+                            ? `H.C. ${ficha.paciente.nroHistoriaClinica}`
                             : 'Sin historia clínica'}
                         </span>
                       </td>
-                      <td>{tarjeta.paciente.procedencia}</td>
+                      <td>
+                        <span
+                          className={`insignia insignia--categoria-${ficha.puntajes.categoria.toLowerCase()}`}
+                        >
+                          {ficha.puntajes.categoria}
+                        </span>
+                      </td>
                       <td className="nowrap">
-                        {formatearFecha(tarjeta.fechaInscripcion)}
+                        {ficha.puntajes.puntajeBasico}
+                      </td>
+                      <td className="nowrap">
+                        {formatearFecha(ficha.fechaInscripcion)}
                       </td>
                       <td>
                         <span
                           className={`insignia ${
-                            tarjeta.activa
+                            ficha.activa
                               ? 'insignia--activa'
                               : 'insignia--inactiva'
                           }`}
                         >
-                          {tarjeta.activa ? 'Activa' : 'Desactivada'}
+                          {ficha.activa ? 'Activa' : 'Desactivada'}
                         </span>
-                      </td>
-                      <td
-                        className="acciones-celda"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <button
-                          type="button"
-                          className="btn btn--fantasma btn--chico"
-                          onClick={() => void alDescargarPdf(tarjeta)}
-                          disabled={descargando === tarjeta.id}
-                          title="Descargar PDF"
-                        >
-                          <Icono nombre="pdf" />
-                          {descargando === tarjeta.id ? 'Generando…' : 'PDF'}
-                        </button>
-                        <Link
-                          to={`/tarjetas/${tarjeta.id}/editar`}
-                          className="btn btn--fantasma btn--chico"
-                          title="Editar"
-                        >
-                          <Icono nombre="editar" />
-                        </Link>
                       </td>
                     </tr>
                   ))}
@@ -228,7 +223,7 @@ export function TarjetasPage() {
             {meta && (
               <div className="paginacion">
                 <span className="paginacion__info">
-                  {meta.total} tarjeta{meta.total === 1 ? '' : 's'} · página{' '}
+                  {meta.total} ficha{meta.total === 1 ? '' : 's'} · página{' '}
                   {meta.page} de {meta.totalPages}
                 </span>
                 <div className="paginacion__controles">
