@@ -289,26 +289,47 @@ function aValores(f: FichaSocial): ValoresFicha {
   };
 }
 
+/** Valor de enum o undefined si está vacío (para el preview parcial). */
+const enumOrUndef = (s: string | undefined): string | undefined =>
+  s && s.trim() !== '' ? s : undefined;
+
+/**
+ * Payload LAXO para el preview en vivo: solo los campos puntuables, omitiendo
+ * los enums sin elegir (JSON.stringify descarta los undefined, así el backend
+ * los salta y devuelve el puntaje parcial en vez de un 400).
+ */
+function payloadPreview(v: ValoresFicha): Record<string, unknown> {
+  const vivienda: Record<string, unknown> = {
+    tenencia: enumOrUndef(v.tenencia),
+    materialConstruccion: enumOrUndef(v.materialConstruccion),
+    nroMiembrosHogar: num(v.nroMiembrosHogar),
+    nroAmbientesDormir: num(v.nroAmbientesDormir),
+    serviciosBasicos: enumOrUndef(v.serviciosBasicos),
+  };
+  return {
+    edad: num(v.edad),
+    gradoInstruccion: enumOrUndef(v.gradoInstruccion),
+    estadoCivil: enumOrUndef(v.estadoCivil),
+    aseguramiento: enumOrUndef(v.aseguramiento),
+    condicionOcupacional: enumOrUndef(v.condicionOcupacional),
+    gradoDependenciaEconomica: enumOrUndef(v.gradoDependenciaEconomica),
+    tramoIngreso: enumOrUndef(v.tramoIngreso),
+    vivienda: Object.values(vivienda).some((x) => x !== undefined)
+      ? vivienda
+      : undefined,
+    equipamientoHogar: enumOrUndef(v.equipamientoHogar),
+    factoresRiesgo: v.factoresRiesgo ?? [],
+  };
+}
+
 /** Panel de puntaje en vivo: recalcula con debounce cada vez que cambia el form. */
 function usePreviewPuntaje(valores: ValoresFicha): PreviewResultado | null {
   const [res, setRes] = useState<PreviewResultado | null>(null);
 
   useEffect(() => {
     const t = setTimeout(() => {
-      const p = aPayload(valores);
       fichasApi
-        .previewPuntaje({
-          edad: p.paciente.edad,
-          gradoInstruccion: p.gradoInstruccion,
-          estadoCivil: p.estadoCivil,
-          aseguramiento: p.aseguramiento,
-          condicionOcupacional: p.condicionOcupacional,
-          gradoDependenciaEconomica: p.gradoDependenciaEconomica,
-          tramoIngreso: p.tramoIngreso,
-          vivienda: p.vivienda,
-          equipamientoHogar: p.equipamientoHogar,
-          factoresRiesgo: p.factoresRiesgo,
-        })
+        .previewPuntaje(payloadPreview(valores))
         .then(setRes)
         .catch(() => {});
     }, 400);
