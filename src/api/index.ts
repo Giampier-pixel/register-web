@@ -1,4 +1,4 @@
-import { http } from './client';
+import { descargarArchivo, http } from './client';
 import type {
   FichaSocial,
   FichaSocialInput,
@@ -64,4 +64,6 @@ export const fichasApi = {
   activar: (id: string) => http.patch<FichaSocial>(`/fichas/${id}/activate`),
   previewPuntaje: (payload: Record<string, unknown>) =>
     http.post<PreviewResultado>('/fichas/preview-puntaje', payload),
+  descargarPdf: (id: string, folio: number) =>
+    descargarArchivo(`/fichas/${id}/pdf`, `ficha-${folio}.pdf`),
 };

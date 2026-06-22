@@ -169,6 +169,7 @@ export function FichasPage() {
                     <th>Puntaje</th>
                     <th>Fecha</th>
                     <th>Estado</th>
+                    <th aria-label="Acciones"></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -213,6 +214,20 @@ export function FichasPage() {
                         >
                           {ficha.activa ? 'Activa' : 'Desactivada'}
                         </span>
+                      </td>
+                      <td className="nowrap">
+                        <button
+                          type="button"
+                          className="btn btn--secundario btn--chico"
+                          title="Descargar PDF"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            fichasApi.descargarPdf(ficha.id, ficha.nroFichaSocial);
+                          }}
+                        >
+                          <Icono nombre="pdf" />
+                        </button>
                       </td>
                     </tr>
                   ))}

@@ -157,6 +157,14 @@ export function FichaDetallePage() {
           </Link>
           <button
             type="button"
+            className="btn btn--secundario"
+            onClick={() => fichasApi.descargarPdf(ficha.id, ficha.nroFichaSocial)}
+          >
+            <Icono nombre="pdf" />
+            Descargar PDF
+          </button>
+          <button
+            type="button"
             className={`btn ${ficha.activa ? 'btn--peligro' : 'btn--secundario'}`}
             onClick={() => setConfirmando(true)}
           >
